@@ -43,7 +43,7 @@ fun ExamScreen(
             )
         }
     ){ innerPadding ->
-        val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+        val uiState = viewModel.ExamUiState.collectAsStateWithLifecycle()
         val currentStageTest = uiState.value.stage
         val context = LocalContext.current
         Box(
