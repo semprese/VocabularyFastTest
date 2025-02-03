@@ -53,14 +53,14 @@ interface WordDao {
     suspend fun deleteCategory(category: Category)
 
     @Query("SELECT * FROM categories")
-    fun getAllCategories(): List<Category>
+    suspend fun getAllCategories(): List<Category>
 
     @Query("SELECT * FROM words")
-    fun getAllWords(): List<Word>
+    suspend fun getAllWords(): List<Word>
 
     @Query("SELECT * FROM words WHERE categoryName LIKE '%' || :categoryName || '%'")
     suspend fun getWordsFromCategory(categoryName: String):List<Word>
 
     @Query("SELECT * FROM words WHERE level = :level AND categoryName LIKE '%' || :categoryName || '%'")
-    fun getWordsFromLevelAndCategory(level: Int, categoryName: String):List<Word>
+    suspend fun getWordsFromLevelAndCategory(level: Int, categoryName: String):List<Word>
 }

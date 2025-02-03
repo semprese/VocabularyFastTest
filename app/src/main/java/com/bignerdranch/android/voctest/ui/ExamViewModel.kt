@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-data class HomeUiState(
+data class ExamUiState(
     val stage: StageTest,
     val isLoading: Boolean,
     val listWords: List<Word> = emptyList()
@@ -22,21 +22,33 @@ data class HomeUiState(
 enum class StageTest {
     HOME, FIRST, SECOND
 }
-
+/*
+Level
+    A1 : 0
+    A2 : 1
+    B1 : 2
+    B2 : 3
+    C1 : 4
+    C2 : 5
+ */
 class ExamViewModel(
     val mainRepository: MainRepository
 ):ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState(StageTest.HOME, true))
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ExamUiState(StageTest.HOME, false))
+    val ExamUiState: StateFlow<ExamUiState> = _uiState.asStateFlow()
 
+    var listCategories = emptyList<Category>()
 
-
-
-    fun loadList(){
-
+    init {
+        viewModelScope.launch {
+            listCategories = mainRepository.getAllCategories()
+        }
     }
 
+
+
+//Temp methods
     fun insertWord(word: Word){
         viewModelScope.launch {
             mainRepository.insertWord(word)
@@ -47,16 +59,41 @@ class ExamViewModel(
             mainRepository.insertCategory(category)
         }
     }
-
-
-    fun getWords(category: Category){
+    fun deleteWord(word: Word){
         viewModelScope.launch {
-             val w = mainRepository.getWord(category.categoryName)
-            if(w.isNotEmpty()) {
-                _uiState.update { HomeUiState(StageTest.HOME, false) }
-            }
+            mainRepository.deleteWord(word)
         }
     }
+    fun deleteCategory(category: Category){
+        viewModelScope.launch {
+            mainRepository.deleteCategory(category)
+        }
+    }
+
+
+    fun getAllWords(){
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val tList = mainRepository.getAllWords()
+            _uiState.update { it.copy(isLoading = false, listWords = tList) }
+        }
+    }
+    fun getAllWordsFromCategory(category: Category){
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val tList = mainRepository.getWordsFromCategory(category)
+            _uiState.update { it.copy(isLoading = false, listWords = tList) }
+        }
+    }
+    fun getWordsFromLevelAndCategory(level:Int, category: Category){
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val tList = mainRepository.getWordsFromLevelAndCategory(level, category)
+            _uiState.update { it.copy(isLoading = false, listWords = tList) }
+        }
+    }
+
+
 
     companion object {
         fun provideFactory(
