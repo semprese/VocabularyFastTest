@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val repo = (application as VocTestApplication).mainRepository
+//        val repo = (application as VocTestApplication).mainRepository
 //        application.deleteDatabase("words_database")
         enableEdgeToEdge()
         setContent {

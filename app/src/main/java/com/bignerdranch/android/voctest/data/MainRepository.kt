@@ -17,21 +17,24 @@ class MainRepository(
     suspend fun deleteWord(word: Word){
         return wordDao.deleteWord(word)
     }
-
+//
     suspend fun insertCategory(category: Category):Long{
         return wordDao.upsertCategory(category)
     }
     suspend fun deleteCategory(category: Category){
         return wordDao.deleteCategory(category)
     }
-
+//
     suspend fun getAllCategories(): List<Category>{
         return wordDao.getAllCategories()
     }
     suspend fun getAllWords(): List<Word>{
         return wordDao.getAllWords()
     }
-
+//
+    suspend fun getWordsFromLevel(level: Int):List<Word>{
+        return wordDao.getWordsFromLevel(level)
+    }
     suspend fun getWordsFromCategory(category: Category): List<Word>{
         return wordDao.getWordsFromCategory(category.categoryName)
     }

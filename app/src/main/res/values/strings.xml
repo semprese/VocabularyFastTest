@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">VocTest</string>
+    <string name="help_of_top_screen">Check the box if you know at least one definition for a word. If you’re not sure about the exact meaning, leave it blank.</string>
 </resources>

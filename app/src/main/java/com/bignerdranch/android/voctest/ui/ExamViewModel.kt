@@ -20,7 +20,7 @@ data class ExamUiState(
 )
 
 enum class StageTest {
-    HOME, FIRST, SECOND
+    FIRST, SECOND, END
 }
 /*
 Level
@@ -35,18 +35,25 @@ class ExamViewModel(
     val mainRepository: MainRepository
 ):ViewModel() {
 
-    private val _uiState = MutableStateFlow(ExamUiState(StageTest.HOME, false))
+    private val _uiState = MutableStateFlow(ExamUiState(StageTest.FIRST, false))
     val ExamUiState: StateFlow<ExamUiState> = _uiState.asStateFlow()
 
-    var listCategories = emptyList<Category>()
+    var listWords = emptyList<Word>()
 
     init {
+        _uiState.update { it.copy(isLoading = true) }
+
         viewModelScope.launch {
-            listCategories = mainRepository.getAllCategories()
+            listWords = mainRepository.getAllWords()
         }
+        _uiState.update { it.copy(isLoading = false) }
     }
 
-
+    fun onChangeStage(stage: StageTest){
+        _uiState.update {
+            it.copy(stage = stage)
+        }
+    }
 
 //Temp methods
     fun insertWord(word: Word){
@@ -72,9 +79,14 @@ class ExamViewModel(
 
 
     fun getAllWords(){
-        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val tList = mainRepository.getAllWords()
+            _uiState.update { it.copy(isLoading = false, listWords = tList) }
+        }
+    }
+    fun getAllWordsFromLevel(level: Int){
+        viewModelScope.launch {
+            val tList = mainRepository.getWordsFromLevel(level)
             _uiState.update { it.copy(isLoading = false, listWords = tList) }
         }
     }

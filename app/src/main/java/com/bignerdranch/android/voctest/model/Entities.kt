@@ -16,9 +16,9 @@ data class Word(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
+    val level: Int,
     @Embedded
-    val categoryName: Category,
-    val level: Int
+    val categoryName: Category
 )
 //
 //@Fts4(contentEntity = Word::class)
@@ -35,7 +35,7 @@ data class Word(
 @Entity(tableName = "categories")
 data class Category(
     @PrimaryKey
-    val categoryName: String
+    val categoryName: String = ""
 )
 
 @Dao
@@ -57,6 +57,9 @@ interface WordDao {
 
     @Query("SELECT * FROM words")
     suspend fun getAllWords(): List<Word>
+
+    @Query("SELECT * FROM words WHERE level = :level")
+    suspend fun getWordsFromLevel(level: Int):List<Word>
 
     @Query("SELECT * FROM words WHERE categoryName LIKE '%' || :categoryName || '%'")
     suspend fun getWordsFromCategory(categoryName: String):List<Word>
