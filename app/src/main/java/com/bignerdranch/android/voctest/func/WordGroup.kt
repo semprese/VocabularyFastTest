@@ -9,6 +9,7 @@ object WordRepository {
         val word = TODO("Get word count from SQL")
         return Word(word, levelPool)
     }
+
     fun count(levelPool: LanguageLevel): Int = TODO("Get word count from SQL")
 
     fun getRandomWords(levelPool: LanguageLevel, count: Int): Set<String> {
@@ -19,7 +20,7 @@ object WordRepository {
 
 class Distribution private constructor(
     private val countByLevel: IntArray,
-    private val knownCountByLevel: IntArray = IntArray(LanguageLevel.values().size) { 0 }
+    private val knownCountByLevel: IntArray = IntArray(LanguageLevel.entries.size) { 0 }
 ) {
     operator fun get(level: LanguageLevel): Int = countByLevel[level.ordinal]
 
@@ -38,7 +39,7 @@ class Distribution private constructor(
     }
 
     fun createBasedOnAnswers(totalWords: Int): Distribution {
-        val weights = IntArray(LanguageLevel.values().size) { index ->
+        val weights = IntArray(LanguageLevel.entries.size) { index ->
             val remaining = countByLevel[index] - knownCountByLevel[index]
             (remaining * 1000) / countByLevel[index].coerceAtLeast(1)
         }
@@ -47,7 +48,7 @@ class Distribution private constructor(
 
     companion object {
         fun create(ratios: IntArray, totalWords: Int): Distribution {
-            require(ratios.size == LanguageLevel.values().size) {
+            require(ratios.size == LanguageLevel.entries.size) {
                 "Ratios array must match the number of language levels"
             }
 
@@ -77,12 +78,16 @@ class WordGroup(val distribution: Distribution) {
     private fun generateWordSet(): Set<Word> {
         val result = linkedSetOf<Word>()
 
-        LanguageLevel.values().forEach { level ->
-            val targetCount = minOf(distribution[level], WordRepository.count(level))
+        LanguageLevel.entries.forEach { level ->
+            var targetCount = minOf(distribution[level], WordRepository.count(level))
 
-            val words = WordRepository.getRandomWords(level, targetCount)
-                .map { Word(it, level) }
-            result.addAll(words)
+            while (targetCount-- > 0) {
+                result.add(WordRepository.getRandomWord(level))
+            }
+
+//            val words = WordRepository.getRandomWords(level, targetCount)
+//                .map { Word(it, level) }
+//            result.addAll(words)
         }
 
         return result

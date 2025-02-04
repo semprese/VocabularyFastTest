@@ -8,6 +8,8 @@ class WordManager {
         else currentGroup.distribution.markWordAsUnknown(word)
     }
 
+    fun getWordList() = currentGroup.words
+
     fun moveToNextGroup() {
         currentGroup = currentGroup.createNextGroup(180)
     }
