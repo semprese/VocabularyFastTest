@@ -5,19 +5,18 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.bignerdranch.android.voctest.ui.ExamViewModel
-import com.bignerdranch.android.voctest.ui.HomeViewModel
+import com.bignerdranch.android.voctest.ui.SharedViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
 
-        initializer {
-            HomeViewModel(vocTestApplication().mainRepository)
-        }
+//        initializer {
+//            HomeViewModel(vocTestApplication().mainRepository)
+//        }
 
 
         initializer {
-            ExamViewModel(vocTestApplication().mainRepository)
+            SharedViewModel(vocTestApplication().mainRepository)
         }
     }
 }

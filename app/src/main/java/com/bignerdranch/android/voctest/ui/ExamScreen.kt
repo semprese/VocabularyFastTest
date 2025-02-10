@@ -3,14 +3,15 @@ package com.bignerdranch.android.voctest.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -29,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,16 +45,19 @@ import com.bignerdranch.android.voctest.AppViewModelProvider
 import com.bignerdranch.android.voctest.R
 import com.bignerdranch.android.voctest.data.MainRepository
 import com.bignerdranch.android.voctest.data.VocDatabase
+import com.bignerdranch.android.voctest.model.ExamWordState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamScreen(
-    viewModel: ExamViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: SharedViewModel = viewModel(factory = AppViewModelProvider.Factory),
     windowWidth: WindowWidthSizeClass,
     onBackHome: () -> Unit,
 ) {
-    val uiState = viewModel.ExamUiState.collectAsStateWithLifecycle()
+    val uiState = viewModel.UiState.collectAsStateWithLifecycle()
     val currentStageTest = uiState.value.stage
+
+
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -78,18 +81,27 @@ fun ExamScreen(
             WindowWidthSizeClass.Expanded -> 3
             else -> 2
         }
+        val wordStateList = uiState.value.listWords.map {
+            ExamWordState(
+                it.name,
+                rememberSaveable { mutableStateOf(false) })
+        }
         if (uiState.value.isLoading)
-            CircularProgressIndicator()
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(modifier = Modifier.width(64.dp))
+            }
         else
             when (currentStageTest) {
                 StageTest.FIRST -> FirstStageScreen(
                     countOfColumn = countOfColumn,
+                    wordStateList = wordStateList,
                     onNextClick = { viewModel.onChangeStage(StageTest.SECOND) },
                     modifier = Modifier.padding(innerPadding)
                 )
 
                 StageTest.SECOND -> SecondStageScreen(
                     countOfColumn = countOfColumn,
+                    wordStateList = wordStateList,
                     onNextClick = { viewModel.onChangeStage(StageTest.SECOND) },
                     modifier = Modifier.padding(innerPadding)
                 )
@@ -105,12 +117,12 @@ fun ExamScreen(
 @Composable
 fun FirstStageScreen(
     countOfColumn: Int,
+    wordStateList: List<ExamWordState>,
     onNextClick: () -> Unit,
     modifier: Modifier,
 ) {
-    val list = List(10) { "aboba" }
-    val listStatesCheck = List(10) { rememberSaveable { mutableStateOf(false) } }
 
+//    val wordStateList = List(10) { rememberSaveable { mutableStateOf(false) } }
     Column(
         modifier = modifier
     ) {
@@ -129,20 +141,22 @@ fun FirstStageScreen(
                         .padding(4.dp)
                 )
             }
-            itemsIndexed(list) { index, word ->
+            itemsIndexed(wordStateList) { index, wordState ->
+                fun changeState() {
+                    wordStateList[index].state.value = !wordStateList[index].state.value
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .padding(horizontal = 30.dp)
                         .clickable {
-                        listStatesCheck[index].value = !listStatesCheck[index].value
-                    }) {
-                    Checkbox(listStatesCheck[index].value, {
-                        listStatesCheck[index].value = !listStatesCheck[index].value
+                            changeState()
+                        }) {
+                    Checkbox(wordStateList[index].state.value, {
+                        changeState()
                     })
                     Text(
-                        word,
+                        wordState.name,
                     )
                 }
             }
@@ -168,7 +182,8 @@ fun FirstStageScreen(
 fun SecondStageScreen(
     countOfColumn: Int,
     modifier: Modifier,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
+    wordStateList: List<ExamWordState>,
 ) {
     TODO("Not yet implemented")
 }
@@ -184,7 +199,7 @@ fun PrevExamScreen() {
     ExamScreen(
         onBackHome = { {} },
         windowWidth = WindowWidthSizeClass.Compact,
-        viewModel = ExamViewModel(
+        viewModel = SharedViewModel(
             MainRepository(
                 VocDatabase.getDatabase(
                     LocalContext.current

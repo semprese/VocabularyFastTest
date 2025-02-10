@@ -1,25 +1,28 @@
 package com.bignerdranch.android.voctest.model
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.Fts4
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Upsert
-import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "words")
 data class Word(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
-    val level: Int,
+    val level: LanguageLevel,
     @Embedded
-    val categoryName: Category
+    val categoryName: Category = Category("")
 )
+enum class LanguageLevel {
+    A1, A2, B1, B2, C1, C2
+}
+
 //
 //@Fts4(contentEntity = Word::class)
 //@Entity(tableName = "words_fts")
@@ -38,6 +41,10 @@ data class Category(
     val categoryName: String = ""
 )
 
+data class ExamWordState(
+    val name: String,
+    val state: MutableState<Boolean>
+)
 @Dao
 interface WordDao {
     @Upsert
@@ -58,8 +65,8 @@ interface WordDao {
     @Query("SELECT * FROM words")
     suspend fun getAllWords(): List<Word>
 
-    @Query("SELECT * FROM words WHERE level = :level")
-    suspend fun getWordsFromLevel(level: Int):List<Word>
+    @Query("SELECT * FROM words WHERE level = :level ORDER BY RANDOM() LIMIT :count")
+    suspend fun getWordsFromLevel(level: Int, count: Int):List<Word>
 
     @Query("SELECT * FROM words WHERE categoryName LIKE '%' || :categoryName || '%'")
     suspend fun getWordsFromCategory(categoryName: String):List<Word>

@@ -1,8 +1,5 @@
 package com.bignerdranch.android.voctest.data
 
-import androidx.room.Delete
-import androidx.room.Query
-import androidx.room.Upsert
 import com.bignerdranch.android.voctest.model.Category
 import com.bignerdranch.android.voctest.model.Word
 import com.bignerdranch.android.voctest.model.WordDao
@@ -32,8 +29,8 @@ class MainRepository(
         return wordDao.getAllWords()
     }
 //
-    suspend fun getWordsFromLevel(level: Int):List<Word>{
-        return wordDao.getWordsFromLevel(level)
+    suspend fun getWordsFromLevel(level: Int, count: Int):List<Word>{
+        return wordDao.getWordsFromLevel(level, count)
     }
     suspend fun getWordsFromCategory(category: Category): List<Word>{
         return wordDao.getWordsFromCategory(category.categoryName)

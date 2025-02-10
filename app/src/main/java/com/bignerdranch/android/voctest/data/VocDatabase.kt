@@ -33,6 +33,7 @@ abstract class VocDatabase : RoomDatabase() {
                     VocDatabase::class.java,
                     "words_database"
                 )
+                    .createFromAsset("database/wordsPreDatabase.db")
 //                    .fallbackToDestructiveMigration()
                     .build()
                     .also { Instance = it }
