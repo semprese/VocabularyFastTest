@@ -41,18 +41,13 @@ class SharedViewModel(
 init {
 //    loadWords()
 }
-    fun onChangeStage(stage: StageTest) {
-        _uiState.update {
-            it.copy(stage = stage)
-        }
-    }
 
-    fun loadWords() {
-        _uiState.update { it.copy(isLoading = true) }
+
+    fun loadWords(stage: StageTest) {
+        _uiState.update { it.copy(isLoading = true, stage = stage) }
         viewModelScope.launch {
             val requiredCount = if (_uiState.value.stage == StageTest.FIRST) 10 else 20
-            val wordGroup = WordGroup.createInitial(
-                mainRepository)
+            val wordGroup = WordGroup.createInitial(mainRepository = mainRepository)
             val listWords = wordGroup.getWordsFromDatabase(LanguageLevel.A1, requiredCount)
             _uiState.update { it.copy(isLoading = false, listWords = listWords) }
         }

@@ -2,13 +2,11 @@ package com.bignerdranch.android.voctest.ui
 
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.bignerdranch.android.voctest.AppViewModelProvider
-import com.bignerdranch.android.voctest.VocTestApplication
 
 enum class MainDestinations(val route: String) {
     HOME("home"),
@@ -35,11 +33,10 @@ fun NavGraph(
                 viewModel = viewModel,
                 windowWidth = windowWidthSizeClassSize,
                 onPlay = { navController.navigate(MainDestinations.EXAM.route)
-                viewModel.loadWords()}
+                viewModel.loadWords(StageTest.FIRST)}
             )
         }
         composable(MainDestinations.EXAM.route) {
-//            viewModel.loadWords()
             ExamScreen(
                 viewModel = viewModel,
                 windowWidth = windowWidthSizeClassSize,

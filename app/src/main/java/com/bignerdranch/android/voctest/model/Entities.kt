@@ -42,7 +42,7 @@ data class Category(
 )
 
 data class ExamWordState(
-    val name: String,
+    val word: Word,
     val state: MutableState<Boolean>
 )
 @Dao

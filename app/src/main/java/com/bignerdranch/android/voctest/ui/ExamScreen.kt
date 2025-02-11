@@ -46,6 +46,7 @@ import com.bignerdranch.android.voctest.R
 import com.bignerdranch.android.voctest.data.MainRepository
 import com.bignerdranch.android.voctest.data.VocDatabase
 import com.bignerdranch.android.voctest.model.ExamWordState
+import com.bignerdranch.android.voctest.model.Word
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,28 +82,24 @@ fun ExamScreen(
             WindowWidthSizeClass.Expanded -> 3
             else -> 2
         }
-        val wordStateList = uiState.value.listWords.map {
-            ExamWordState(
-                it.name,
-                rememberSaveable { mutableStateOf(false) })
-        }
+
         if (uiState.value.isLoading)
             Box(contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(modifier = Modifier.width(64.dp))
             }
         else
             when (currentStageTest) {
-                StageTest.FIRST -> FirstStageScreen(
+                StageTest.FIRST -> ExamScreen(
                     countOfColumn = countOfColumn,
-                    wordStateList = wordStateList,
-                    onNextClick = { viewModel.onChangeStage(StageTest.SECOND) },
+                    wordList = uiState.value.listWords,
+                    onNextClick = { viewModel.loadWords(StageTest.SECOND) },
                     modifier = Modifier.padding(innerPadding)
                 )
 
-                StageTest.SECOND -> SecondStageScreen(
+                StageTest.SECOND -> ExamScreen(
                     countOfColumn = countOfColumn,
-                    wordStateList = wordStateList,
-                    onNextClick = { viewModel.onChangeStage(StageTest.SECOND) },
+                    wordList = uiState.value.listWords,
+                    onNextClick = { viewModel.loadWords(StageTest.END) },
                     modifier = Modifier.padding(innerPadding)
                 )
 
@@ -115,14 +112,17 @@ fun ExamScreen(
 }
 
 @Composable
-fun FirstStageScreen(
+fun ExamScreen(
     countOfColumn: Int,
-    wordStateList: List<ExamWordState>,
+    wordList: List<Word>,
     onNextClick: () -> Unit,
     modifier: Modifier,
 ) {
-
-//    val wordStateList = List(10) { rememberSaveable { mutableStateOf(false) } }
+    val wordStateList = wordList.map {
+        ExamWordState(
+            it,
+            rememberSaveable { mutableStateOf(false) })
+    }
     Column(
         modifier = modifier
     ) {
@@ -156,7 +156,7 @@ fun FirstStageScreen(
                         changeState()
                     })
                     Text(
-                        wordState.name,
+                        wordState.word.name,
                     )
                 }
             }
@@ -176,16 +176,6 @@ fun FirstStageScreen(
         }
     }
 
-}
-
-@Composable
-fun SecondStageScreen(
-    countOfColumn: Int,
-    modifier: Modifier,
-    onNextClick: () -> Unit,
-    wordStateList: List<ExamWordState>,
-) {
-    TODO("Not yet implemented")
 }
 
 @Composable
